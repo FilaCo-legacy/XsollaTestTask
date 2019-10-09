@@ -4,7 +4,7 @@
 namespace NewsFeedModule;
 
 
-class NewsFeedFactory
+interface InteractionModule
 {
 
 }
