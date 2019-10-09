@@ -3,15 +3,27 @@
 
 namespace NewsFeedModule;
 
-
-interface INewsFeed
+/**
+ * Интерфейс новостной ленты
+ * @package NewsFeedModule
+ */
+interface NewsFeed
 {
-    function canAddNews(User $user): bool;
-    function addNews(User $author, string $user): INews;
+    /**
+     * Получить модуль взаимодействий ленты
+     * @return InteractionModule - ссылка на модуль взаимодействий
+     */
+    function getInteractionModule(): InteractionModule;
 
-    function canAddCategories(User $user): bool;
-    function addCategory(User $author, string $categoryName): Category;
+    /**
+     * Получить модуль категорий
+     * @return CategoriesModule - ссылка на модуль категорий
+     */
+    function getCategoriesModule(): CategoriesModule;
 
-    function getAllNews(): array;
-    function getAllCategories(): array;
+    /**
+     * Получить модуль новостей
+     * @return NewsModule - ссылка на модуль новостей
+     */
+    function getNewsModule(): NewsModule;
 }
