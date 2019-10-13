@@ -33,10 +33,12 @@ class User
      */
     private $createdNews;
 
-    public function __construct()
+    public function __construct(string $nickname)
     {
         $this->likedNews = new ArrayCollection();
         $this->createdNews = new ArrayCollection();
+
+        $this->setNickname($nickname);
     }
 
     public function getId(): ?int

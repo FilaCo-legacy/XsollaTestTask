@@ -43,10 +43,14 @@ class News
      */
     private $categories;
 
-    public function __construct()
+    public function __construct(\DateTimeInterface $dateAdded, User $author, string $text)
     {
         $this->usersLiked = new ArrayCollection();
         $this->categories = new ArrayCollection();
+
+        $this->setDateAdded($dateAdded);
+        $this->setAuthor($author);
+        $this->setText($text);
     }
 
     public function getId(): ?int

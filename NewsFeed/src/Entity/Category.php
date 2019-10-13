@@ -69,7 +69,7 @@ class Category
         return $this;
     }
 
-    /*public function removeNews(News $news): self
+    public function removeNews(News $news): self
     {
         if ($this->news->contains($news)) {
             $this->news->removeElement($news);
@@ -77,5 +77,5 @@ class Category
         }
 
         return $this;
-    }*/
+    }
 }
