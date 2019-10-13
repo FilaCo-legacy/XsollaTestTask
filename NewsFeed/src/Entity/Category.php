@@ -28,9 +28,10 @@ class Category
      */
     private $news;
 
-    public function __construct()
+    public function __construct(string $name)
     {
         $this->news = new ArrayCollection();
+        $this->setName($name);
     }
 
     public function getId(): ?int
@@ -68,7 +69,7 @@ class Category
         return $this;
     }
 
-    public function removeNews(News $news): self
+    /*public function removeNews(News $news): self
     {
         if ($this->news->contains($news)) {
             $this->news->removeElement($news);
@@ -76,5 +77,5 @@ class Category
         }
 
         return $this;
-    }
+    }*/
 }
