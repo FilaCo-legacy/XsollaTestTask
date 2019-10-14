@@ -7,7 +7,7 @@ namespace NewsFeedModule\Architecture;
  * Интерфейс новостной ленты
  * @package NewsFeedModule
  */
-interface NewsFeed
+interface NewsFeedInterface
 {
     /**
      * Получить модуль взаимодействий ленты
@@ -23,7 +23,7 @@ interface NewsFeed
 
     /**
      * Получить модуль новостей
-     * @return NewsModule - ссылка на модуль новостей
+     * @return NewsModuleInterface - ссылка на модуль новостей
      */
-    function getNewsModule(): NewsModule;
+    function getNewsModule(): NewsModuleInterface;
 }

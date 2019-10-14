@@ -3,26 +3,28 @@
 
 namespace NewsFeedModule\Architecture;
 
+use NewsFeedModule\NewsInterface;
+
 /**
  * Интерфейс модуля для работы с постами новостной ленты
  * @package NewsFeedModule
  */
-interface NewsModule
+interface NewsModuleInterface
 {
     /**
      * Проверить, имеет ли юзер права на добавление новостей
-     * @param User $user - ссылка на пользователя
+     * @param UserInterface $user - ссылка на пользователя
      * @return bool - true, если пользователь имеет права добавлять новости, иначе false
      */
-    function canAddNews(User $user): bool;
+    function canAddNews(UserInterface $user): bool;
 
     /**
      * Добавить новый пост в ленту
-     * @param User $author - автор поста
+     * @param UserInterface $author - автор поста
      * @param string $text - текст новости
-     * @return News - ссылка на новый объект новости
+     * @return NewsInterface - ссылка на новый объект новости
      */
-    function addNews(User $author, string $text): News;
+    function addNews(UserInterface $author, string $text): NewsInterface;
 
     /**
      * Получить все новости из ленты, сущетсвующие на момент вызова
