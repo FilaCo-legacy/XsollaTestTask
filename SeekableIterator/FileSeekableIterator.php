@@ -2,30 +2,19 @@
 
 namespace SeekableIteratorTask;
 
-use http\Exception\InvalidArgumentException;
 use SeekableIterator;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class FileSeekableIterator implements SeekableIterator
 {
-    public const FULL_MODE = 0;
-    public const BLOCK_MODE = 1;
-    public const STRING_MODE = 2;
-
-    private $position;
-
     private $fileDescriptor;
 
-    public function __construct(FileFactoryInterface $fileFactory, string $fileName, int $readMode = self::STRING_MODE)
+    private $blockSize;
+
+    public function __construct(string $path, int $blockSize = 255)
     {
-        $this->fileDescriptor = $fileFactory->openFile($fileName);
-    }
-
-    public function configure(int $mode){
-        if ($mode < 0 || $mode > 2)
-            throw new InvalidArgumentException("Некорректный режим считывания файла");
-
-        $this->rewind();
-        $this->fileDescriptor->setReadMode($mode);
+        $this->fileDescriptor = fopen($path, "r");
+        $this->blockSize = $blockSize;
     }
 
     /**
@@ -36,7 +25,12 @@ class FileSeekableIterator implements SeekableIterator
      */
     public function current()
     {
-        return $this->fileDescriptor->getToken($this->position);
+        $result = fread($this->fileDescriptor, $this->blockSize);
+
+        if ($result === false)
+            throw new FileException("Невозможно прочитать блок: файл закончился");
+
+        return $result;
     }
 
     /**
@@ -47,7 +41,12 @@ class FileSeekableIterator implements SeekableIterator
      */
     public function next()
     {
-        ++$this->position;
+        $result = fseek($this->fileDescriptor,$this->blockSize, SEEK_CUR);
+
+        if ($result === -1)
+            throw new FileException("Невозможно передвинуть указатель блока");
+
+        return $result;
     }
 
     /**
@@ -58,7 +57,7 @@ class FileSeekableIterator implements SeekableIterator
      */
     public function key()
     {
-        return $this->position;
+        return ftell($this->fileDescriptor);
     }
 
     /**
@@ -70,7 +69,7 @@ class FileSeekableIterator implements SeekableIterator
      */
     public function valid()
     {
-        return $this->position >= 0 && $this->position < $this->fileDescriptor->reachedEOF();
+        return !feof($this->fileDescriptor);
     }
 
     /**
@@ -81,7 +80,7 @@ class FileSeekableIterator implements SeekableIterator
      */
     public function rewind()
     {
-        $this -> position = 0;
+        rewind($this->fileDescriptor);
     }
 
     /**
@@ -95,9 +94,11 @@ class FileSeekableIterator implements SeekableIterator
      */
     public function seek($position)
     {
-        if ($position < 0 || $position >= $this->fileDescriptor->reachedEOF())
-            throw new \OutOfBoundsException("Некорректная позиция для просмотра");
+        $result = fseek($this->fileDescriptor, $this->blockSize * $position);
 
-        $this->$position = $position;
+        if ($result === -1)
+            throw new FileException("Невозможно передвинуть указатель блока");
+
+        return $result;
     }
 }
