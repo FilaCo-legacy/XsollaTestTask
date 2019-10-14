@@ -2,8 +2,8 @@
 
 namespace SeekableIteratorTask;
 
+use Exception;
 use SeekableIterator;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class FileSeekableIterator implements SeekableIterator
 {
@@ -17,18 +17,25 @@ class FileSeekableIterator implements SeekableIterator
         $this->blockSize = $blockSize;
     }
 
+    public function __destruct()
+    {
+        fclose($this->fileDescriptor);
+    }
+
     /**
      * Return the current element
      * @link https://php.net/manual/en/iterator.current.php
      * @return mixed Can return any type.
      * @since 5.0.0
+     * @throws Exception
      */
     public function current()
     {
         $result = fread($this->fileDescriptor, $this->blockSize);
+        fseek($this->fileDescriptor, -$this->blockSize, SEEK_CUR);
 
         if ($result === false)
-            throw new FileException("Невозможно прочитать блок: файл закончился");
+            throw new Exception("Невозможно прочитать блок: файл закончился");
 
         return $result;
     }
@@ -42,11 +49,6 @@ class FileSeekableIterator implements SeekableIterator
     public function next()
     {
         $result = fseek($this->fileDescriptor,$this->blockSize, SEEK_CUR);
-
-        if ($result === -1)
-            throw new FileException("Невозможно передвинуть указатель блока");
-
-        return $result;
     }
 
     /**
@@ -57,7 +59,7 @@ class FileSeekableIterator implements SeekableIterator
      */
     public function key()
     {
-        return ftell($this->fileDescriptor);
+        return ftell($this->fileDescriptor)/$this->blockSize;
     }
 
     /**
@@ -91,14 +93,30 @@ class FileSeekableIterator implements SeekableIterator
      * </p>
      * @return void
      * @since 5.1.0
+     * @throws Exception
      */
     public function seek($position)
     {
         $result = fseek($this->fileDescriptor, $this->blockSize * $position);
 
         if ($result === -1)
-            throw new FileException("Невозможно передвинуть указатель блока");
+            throw new Exception("Невозможно передвинуть указатель блока");
 
         return $result;
     }
 }
+
+/*$handler = fopen("123.txt", "a");
+$str = "abcdefghijklmnopqrstuvwxyz";
+
+while (filesize("123.txt") + strlen($str)< 2147483647)
+    fwrite($handler, $str);*/
+
+$iterator = new FileSeekableIterator("123.txt");
+$copyFile = fopen("123copy.txt", "w");
+
+foreach ($iterator as $textBlock)
+    fwrite($copyFile, $textBlock);
+
+fclose($copyFile);
+$iterator->__destruct();
