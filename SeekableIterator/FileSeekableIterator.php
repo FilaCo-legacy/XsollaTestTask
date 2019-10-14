@@ -101,8 +101,6 @@ class FileSeekableIterator implements SeekableIterator
 
         if ($result === -1)
             throw new Exception("Невозможно передвинуть указатель блока");
-
-        return $result;
     }
 }
 
